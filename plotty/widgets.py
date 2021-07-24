@@ -1,3 +1,4 @@
+from plotty.plotty import Plotty
 import ipywidgets as widgets
 
 __all__ = ["LogFiles"]
@@ -20,7 +21,7 @@ class OnDisappearMixin(object):
 
 
 class LogFiles(widgets.SelectMultiple, OnDisappearMixin):
-    def __init__(self, plotty):
+    def __init__(self, plotty: Plotty):
         p = plotty.log_dir
         folders = sorted([x for x in p.iterdir() if x.is_dir()])
         super().__init__(
@@ -36,7 +37,7 @@ class LogFiles(widgets.SelectMultiple, OnDisappearMixin):
     def _value_changed(self, name, old, new):
         if DEBUG:
             self._log_message += "value={}\n".format(new)
-        self.plotty.log_files = new
+        self.plotty.set_log_files(new)
 
     def on_disappear(self):
-        self.plotty.log_files = []
+        self.plotty.set_log_files([])

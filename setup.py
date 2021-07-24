@@ -16,7 +16,7 @@ with open(path.join(here, NAME, '__version__.py')) as f:
     exec(f.read(), about)
 
 setup(
-    name="running-ng",
+    name="plotty-ng",
     version=about["__VERSION__"],
     description='Plotty: Next Generation',
     long_description=long_description,
