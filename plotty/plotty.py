@@ -5,6 +5,7 @@ import pandas as pd
 import ipywidgets as widgets
 from IPython.display import display
 
+
 class Plotty(object):
     _DEBUG_OUT = widgets.Output(layout={'border': '1px solid black'})
 
@@ -17,20 +18,25 @@ class Plotty(object):
 
     def set_log_files(self, folders: Iterable[Path]):
         self.log_files = folders
-        scnario_dfs = []
+        scenario_dfs = []
         result_dfs = []
         for folder in folders:
-            scnarios, results = parse_folder(folder)
-            scnario_dfs.append(scnarios)
+            scenarios, results = parse_folder(folder)
+            scenario_dfs.append(scenarios)
             result_dfs.append(results)
-        self.df_scenario = pd.concat(scnario_dfs)
+        self.df_scenario = pd.concat(scenario_dfs)
         self.df_result = pd.concat(result_dfs)
 
-    def dump(self):
-        print("Log dir: {}".format(self.log_dir))
-        print("Log files: {}".format(self.log_files))
-        print(self.df_scenario)
-        print(self.df_result)
+    def dump(self, pipeline=None):
+        if pipeline is None:
+            pipeline = []
+        print(self.run_pipeline(pipeline))
 
-    def draw(self):
+    def draw(self, pipeline):
         pass
+
+    def run_pipeline(self, pipeline):
+        df = self.df_result
+        for p in pipeline:
+            df = p.process(self.df_scenario, df)
+        return df

@@ -106,7 +106,6 @@ def parse_lines(lines: List[str]):
             else:
                 bmtime = parse_dacapo_iteration(line)
                 if bmtime is not None:
-                    iteration += 1
                     current_iteration = {
                         "invocation": invocation,
                         "iteration": iteration,
@@ -152,28 +151,28 @@ def process_one_file(path: Path):
 
 
 def parse_folder(path: Path):
-    senarios = []
+    scenarios = []
     results = []
     for p in path.glob("*.log.gz"):
         suffixes = p.name.split(".")
-        senario = {}
-        uid = uuid.uuid4()
-        senario["_id"] = uid
-        senario["benchmark"] = suffixes[0]
-        senario["hfac"] = int(suffixes[1])
-        senario["heap"] = int(suffixes[2])
+        scenario = {}
+        uid = str(uuid.uuid4())
+        scenario["_id"] = uid
+        scenario["benchmark"] = suffixes[0]
+        scenario["hfac"] = int(suffixes[1])
+        scenario["heap"] = int(suffixes[2])
         buildstring = ".".join(suffixes[3:-2])
-        senario["buildstring"] = buildstring
-        senario["build"] = suffixes[3]
+        scenario["buildstring"] = buildstring
+        scenario["build"] = suffixes[3]
         for modifier in suffixes[4:-2]:
             parts = modifier.split("-")
             if len(parts) == 1:
-                senario[parts[0]] = True
+                scenario[parts[0]] = True
             else:
-                senario[parts[0]] = "-".join(parts[1:])
+                scenario[parts[0]] = "-".join(parts[1:])
         lst_stats = process_one_file(p)
         for stat in lst_stats:
-            stat["senario"] = uid
+            stat["scenario"] = uid
         results.extend(lst_stats)
-        senarios.append(senario)
-    return pd.DataFrame(senarios), pd.DataFrame(results)
+        scenarios.append(scenario)
+    return pd.DataFrame(scenarios), pd.DataFrame(results)
