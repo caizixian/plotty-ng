@@ -7,20 +7,26 @@ class Plotty(object):
     def __init__(self, log_dir: str):
         self.log_dir = Path(log_dir)
         self.log_files = []
-        self.df = pd.DataFrame()
+        self.df_scenario = pd.DataFrame()
+        self.df_result = pd.DataFrame()
+
         
     def set_log_files(self, folders: Iterable[Path]):
         self.log_files = folders
-        dfs = []
+        scnario_dfs = []
+        result_dfs = []
         for folder in folders:
-            df = parse_folder(folder)
-            dfs.append(df)
-        self.df = pd.concat(dfs)
+            scnarios, results = parse_folder(folder)
+            scnario_dfs.append(scnarios)
+            result_dfs.append(results)
+        self.df_scenario = pd.concat(scnario_dfs)
+        self.df_result = pd.concat(result_dfs)
 
     def dump(self):
         print("Log dir: {}".format(self.log_dir))
         print("Log files: {}".format(self.log_files))
-        print(self.df)
+        print(self.df_scenario)
+        print(self.df_result)
     
     def draw(self):
         pass

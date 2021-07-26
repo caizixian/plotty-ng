@@ -1,5 +1,6 @@
 from plotty.plotty import Plotty
 import ipywidgets as widgets
+from pathlib import Path
 
 __all__ = ["LogFiles"]
 
@@ -37,7 +38,7 @@ class LogFiles(widgets.SelectMultiple, OnDisappearMixin):
     def _value_changed(self, name, old, new):
         if DEBUG:
             self._log_message += "value={}\n".format(new)
-        self.plotty.set_log_files(new)
+        self.plotty.set_log_files([Path(x) for x in new])
 
     def on_disappear(self):
         self.plotty.set_log_files([])
