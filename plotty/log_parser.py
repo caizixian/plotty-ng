@@ -96,6 +96,7 @@ def parse_lines(lines: List[str]):
                 if current_iteration is not None:
                     rows.append(current_iteration)
                 iteration += 1
+                state = ParsingMode.NON_STATS
             if state is ParsingMode.ERROR:
                 continue
             if check_mmtk_start(line):
@@ -129,12 +130,14 @@ def parse_lines(lines: List[str]):
                 state = ParsingMode.TABULATE_STATS_VALUES
             elif state is ParsingMode.MMTk_STATS_VALUES:
                 values = map(float, line.strip().split("\t"))
-                current_iteration.update(dict(zip(column_names, values)))
+                if current_iteration is not None:
+                    current_iteration.update(dict(zip(column_names, values)))
                 column_names = None
                 state = ParsingMode.NON_STATS
             elif state is ParsingMode.TABULATE_STATS_VALUES:
                 values = map(float, line.strip().split("\t"))
-                current_iteration.update(dict(zip(column_names, values)))
+                if current_iteration is not None:
+                    current_iteration.update(dict(zip(column_names, values)))
                 column_names = None
                 state = ParsingMode.NON_STATS
      # append the data for the last iteration
