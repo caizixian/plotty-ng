@@ -12,6 +12,7 @@ class OnDisappearMixin(object):
         self._log_message = ""
         self.observe(self._view_count_changed, '_view_count')
 
+    @Plotty._DEBUG_OUT.capture()
     def _view_count_changed(self, change):
         assert change['type'] == "change"
         assert change['name'] == '_view_count'
@@ -35,10 +36,12 @@ class LogFiles(widgets.SelectMultiple, OnDisappearMixin):
         )
         self.plotty = plotty
     
+    @Plotty._DEBUG_OUT.capture()
     def _value_changed(self, name, old, new):
         if DEBUG:
             self._log_message += "value={}\n".format(new)
         self.plotty.set_log_files([Path(x) for x in new])
 
+    @Plotty._DEBUG_OUT.capture()
     def on_disappear(self):
         self.plotty.set_log_files([])
