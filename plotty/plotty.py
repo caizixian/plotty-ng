@@ -7,17 +7,19 @@ from IPython.display import display
 
 
 class Plotty(object):
-    _DEBUG_OUT = widgets.Output(layout={'border': '1px solid black'})
+    _DEBUG_OUT = widgets.Output(
+        layout={'border': '1px solid black'},
+    )
 
     def __init__(self, log_dir: str):
         self.log_dir = Path(log_dir)
-        self.log_files = []
+        self.result_dirs = []
         self.df_scenario = pd.DataFrame()
         self.df_result = pd.DataFrame()
         display(Plotty._DEBUG_OUT)
 
-    def set_log_files(self, folders: Iterable[Path]):
-        self.log_files = folders
+    def set_result_dirs(self, folders: Iterable[Path]):
+        self.result_dirs = folders
         scenario_dfs = []
         result_dfs = []
         for folder in folders:
@@ -27,15 +29,18 @@ class Plotty(object):
         self.df_scenario = pd.concat(scenario_dfs)
         self.df_result = pd.concat(result_dfs)
 
-    def dump(self, pipeline=None):
-        if pipeline is None:
-            pipeline = []
-        print(self.run_pipeline(pipeline))
+    def get_scenario_columns(self):
+        return [c for c in self.df_scenario.columns if not c.startswith("_")]
 
-    def draw(self, pipeline):
-        pass
+    def get_value_columns(self):
+        return [c for c in self.df_result.columns if not c == "scenario"]
 
-    def run_pipeline(self, pipeline):
+    def get_scenario_unique_values(self, column):
+        xs = self.df_scenario[column].unique()
+        xs.sort()
+        return xs
+
+    def process(self, pipeline):
         df = self.df_result
         for p in pipeline:
             df = p.process(self.df_scenario, df)
