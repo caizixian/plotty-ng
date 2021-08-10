@@ -108,7 +108,7 @@ class ScenarioFilter(widgets.HBox):
                 ~df_scenario[self.column_dropdown.value].isin(
                     self.value_select.value)
             ]
-        return df_result[df_result['scenario'].isin(valid_scenarios["_id"])]
+        return valid_scenarios, df_result[df_result['scenario'].isin(valid_scenarios.index)]
 
 
 class IterationFilter(object):
@@ -117,7 +117,7 @@ class IterationFilter(object):
 
     @Plotty._DEBUG_OUT.capture()
     def process(self, df_scenario, df_result):
-        return df_result.loc[df_result["iteration"] == self.iteration]
+        return df_scenario, df_result.loc[df_result["iteration"] == self.iteration]
 
 
 class Normalization(widgets.VBox):
@@ -156,7 +156,7 @@ class Normalization(widgets.VBox):
             return df_result
         dfs = []
         for _labels, group in df_scenario.groupby(list(groupby)):
-            df = df_result[df_result['scenario'].isin(group["_id"])].copy()
+            df = df_result[df_result['scenario'].isin(group.index)].copy()
             for value in self.value_columns.value:
                 if self.inverted:
                     worst_val = df.groupby("scenario")[value].mean().max()
@@ -165,4 +165,4 @@ class Normalization(widgets.VBox):
                     best_val = df.groupby("scenario")[value].mean().min()
                     df["{}.normalized".format(value)] = df[value] / best_val
             dfs.append(df)
-        return pd.concat(dfs)
+        return df_scenario, pd.concat(dfs)

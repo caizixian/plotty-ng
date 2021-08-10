@@ -20,6 +20,10 @@ class Plotty(object):
 
     def set_result_dirs(self, folders: Iterable[Path]):
         self.result_dirs = folders
+        if not folders:
+            self.df_scenario = pd.DataFrame()
+            self.df_result = pd.DataFrame()
+            return
         scenario_dfs = []
         result_dfs = []
         for folder in folders:
@@ -27,6 +31,7 @@ class Plotty(object):
             scenario_dfs.append(scenarios)
             result_dfs.append(results)
         self.df_scenario = pd.concat(scenario_dfs)
+        self.df_scenario.set_index("_id", inplace = True)
         self.df_result = pd.concat(result_dfs)
 
     def get_scenario_columns(self):
@@ -41,10 +46,11 @@ class Plotty(object):
         return xs
 
     def process(self, pipeline):
-        df = self.df_result
+        df_scenario = self.df_scenario
+        df_result = self.df_result
         for p in pipeline:
-            df = p.process(self.df_scenario, df)
-        return df.join(self.df_scenario.set_index('_id'), on='scenario')
+            df_scenario, df_result = p.process(df_scenario, df_result)
+        return df_result.join(self.df_scenario, on='scenario')
     
     def values_preprocessing(self, func):
         func(self.df_result)
