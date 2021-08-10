@@ -123,7 +123,7 @@ class IterationFilter(object):
 class Normalization(widgets.VBox):
     DEBUG = True
 
-    def __init__(self, plotty: Plotty):
+    def __init__(self, plotty: Plotty, inverted: bool = False):
         self.plotty = plotty
         columns = self.plotty.get_scenario_columns()
         self.groupby = widgets.SelectMultiple(
@@ -143,6 +143,7 @@ class Normalization(widgets.VBox):
                 height="{}px".format(len(columns) * 10)
             )
         )
+        self.inverted = inverted
         super().__init__(
             children=[self.value_columns, self.groupby]
         )
@@ -157,7 +158,11 @@ class Normalization(widgets.VBox):
         for _labels, group in df_scenario.groupby(list(groupby)):
             df = df_result[df_result['scenario'].isin(group["_id"])].copy()
             for value in self.value_columns.value:
-                best_val = df.groupby("scenario")[value].mean().min()
-                df["{}.normalized".format(value)] = df[value] / best_val
+                if self.inverted:
+                    worst_val = df.groupby("scenario")[value].mean().max()
+                    df["{}.normalized_inverted".format(value)] = worst_val / df[value]
+                else:
+                    best_val = df.groupby("scenario")[value].mean().min()
+                    df["{}.normalized".format(value)] = df[value] / best_val
             dfs.append(df)
         return pd.concat(dfs)

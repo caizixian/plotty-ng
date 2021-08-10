@@ -44,4 +44,10 @@ class Plotty(object):
         df = self.df_result
         for p in pipeline:
             df = p.process(self.df_scenario, df)
-        return df
+        return df.join(self.df_scenario.set_index('_id'), on='scenario')
+    
+    def values_preprocessing(self, func):
+        func(self.df_result)
+    
+    def scenarios_preprocessing(self, func):
+        func(self.df_scenario)
