@@ -51,10 +51,10 @@ def check_error(line: str) -> bool:
 def parse_dacapo_iteration(line: str) -> Optional[int]:
     m = DaCapo_PASSED.search(line)
     if m:
-        return m.group(1)
+        return float(m.group(1))
     m = DaCapo_WARMUP.search(line)
     if m:
-        return m.group(1)
+        return float(m.group(1))
     return None
 
 
@@ -62,12 +62,12 @@ def parse_dacapo_latency(line: str) -> Optional[List[int]]:
     m = DaCapo_LATENCY.search(line)
     if m:
         return dict(
-            p50=m.group(1),
-            p90=m.group(2),
-            p99=m.group(3),
-            p999=m.group(4),
-            p9999=m.group(5),
-            pmax=m.group(6)
+            p50=float(m.group(1)),
+            p90=float(m.group(2)),
+            p99=float(m.group(3)),
+            p999=float(m.group(4)),
+            p9999=float(m.group(5)),
+            pmax=float(m.group(6))
         )
     else:
         return None
