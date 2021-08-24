@@ -96,6 +96,10 @@ def parse_lines(lines: List[str]):
                 if current_iteration is not None:
                     rows.append(current_iteration)
                 iteration += 1
+                current_iteration = {
+                    "invocation": invocation,
+                    "iteration": iteration,
+                }
                 state = ParsingMode.NON_STATS
             if state is ParsingMode.ERROR:
                 continue
@@ -106,11 +110,7 @@ def parse_lines(lines: List[str]):
             else:
                 bmtime = parse_dacapo_iteration(line)
                 if bmtime is not None:
-                    current_iteration = {
-                        "invocation": invocation,
-                        "iteration": iteration,
-                        "bmtime": bmtime
-                    }
+                    current_iteration["bmtime"] = bmtime
                     continue
                 latency = parse_dacapo_latency(line)
                 if latency is not None and current_iteration is not None:
