@@ -8,13 +8,12 @@ import re
 
 # The four regular expressions below are borrowed from https://github.com/jamesbornholt/plotty
 # MIT License Copyright (c) 2021 James Bornholt
-TIMEDRUN = re.compile("mkdir.*timedrun")
-DaCapo_ERROR = re.compile('NullPointerException|JikesRVM: WARNING: Virtual processor has ignored timer interrupt|hardware trap|-- Stack --|code: -1|OutOfMemory|ArrayIndexOutOfBoundsException|FileNotFoundException|FAILED warmup|Validation FAILED|caught alarm')
-DaCapo_STARTING = re.compile("=====(==|) .* (S|s)tarting")
-DaCapo_PASSED = re.compile("PASSED in (\d+) msec")
-DaCapo_WARMUP = re.compile("completed warmup \d* *in (\d+) msec")
-DaCapo_LATENCY = re.compile(
-    "tail latency: 50% (\d+) usec, 90% (\d+) usec, 99% (\d+) usec, 99.9% (\d+) usec, 99.99% (\d+) usec, max (\d+) usec")
+TIMEDRUN = re.compile(r"mkdir.*timedrun")
+DaCapo_ERROR = re.compile(r'NullPointerException|JikesRVM: WARNING: Virtual processor has ignored timer interrupt|hardware trap|-- Stack --|code: -1|OutOfMemory|ArrayIndexOutOfBoundsException|FileNotFoundException|FAILED warmup|Validation FAILED|caught alarm')
+DaCapo_STARTING = re.compile(r"=====(==|) .* (S|s)tarting")
+DaCapo_PASSED = re.compile(r"PASSED in (\d+) msec")
+DaCapo_WARMUP = re.compile(r"completed warmup \d* *in (\d+) msec")
+DaCapo_LATENCY = re.compile(r"DaCapo (\w*) *tail latency: 50% (\d+) usec, 90% (\d+) usec, 99% (\d+) usec, 99.9% (\d+) usec, 99.99% (\d+) usec, max (\d+) usec")
 MMTk_HEADER = "============================ MMTk Statistics Totals ============================"
 TABULATE_HEADER = "============================ Tabulate Statistics ============================"
 
@@ -61,14 +60,18 @@ def parse_dacapo_iteration(line: str) -> Optional[int]:
 def parse_dacapo_latency(line: str) -> Optional[List[int]]:
     m = DaCapo_LATENCY.search(line)
     if m:
-        return dict(
-            p50=float(m.group(1)),
-            p90=float(m.group(2)),
-            p99=float(m.group(3)),
-            p999=float(m.group(4)),
-            p9999=float(m.group(5)),
-            pmax=float(m.group(6))
+        latencies = dict(
+            p50=float(m.group(2)),
+            p90=float(m.group(3)),
+            p99=float(m.group(4)),
+            p999=float(m.group(5)),
+            p9999=float(m.group(6)),
+            pmax=float(m.group(7))
         )
+        latency_suffix = m.group(1)
+        if latency_suffix:
+            latencies = {k+".{}".format(latency_suffix): v for k, v in latencies.items()}
+        return latencies
     else:
         return None
 
