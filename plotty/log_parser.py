@@ -92,7 +92,7 @@ def parse_lines(lines: List[str]):
             iteration = 0
             state = ParsingMode.NON_STATS
             continue
-        if line.startswith("="):
+        if line.startswith("=") or line.startswith("\a="):
             # possibly special line
             if check_iteration_start(line):
                 # append the data for the previous iteration
