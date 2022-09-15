@@ -1,4 +1,4 @@
-jupyterlab==3.4.6
+jupyterlab==3.4.7
 matplotlib==3.5.3
 pandas==1.4.4
 seaborn==0.12.0
